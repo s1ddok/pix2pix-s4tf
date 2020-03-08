@@ -2,12 +2,29 @@ import TensorFlow
 import Files
 import Foundation
 import TensorBoardX
+import ArgumentParser
 
-let logdir = URL(fileURLWithPath: "/tmp/tensorboardx").appendingPathComponent(String(Int(Date().timeIntervalSince1970)))
+struct Options: ParsableArguments {
+    @Option(default: "/notebooks/avolodin/data/facades/", help: ArgumentHelp("Path to the splitted dataset folder", valueName: "dataset"))
+    var datasetPath: String
+    
+    @Option(default: 3, help: ArgumentHelp("GPU Index", valueName: "gpu-index"))
+    var gpuIndex: UInt
+    
+    @Option(default: 3, help: ArgumentHelp("Number of epochs", valueName: "epochs"))
+    var epochs: Int
+    
+    @Option(default: "/tmp/tensorboardx", help: ArgumentHelp("TensorBoard logdir path", valueName: "tensorboard-logdir"))
+    var tensorboardLogdir: String
+}
+
+let options = Options.parseOrExit()
+
+let logdir = URL(fileURLWithPath: options.tensorboardLogdir).appendingPathComponent(String(Int(Date().timeIntervalSince1970)))
 //try? FileManager.default.removeItem(at: logdir)
 let writer = SummaryWriter(logdir: logdir)
 
-let facadesFolder = try Folder(path: "/notebooks/avolodin/data/facades/")
+let facadesFolder = try Folder(path: options.datasetPath)
 let trainFolder = try facadesFolder.subfolder(named: "train")
 let testFolder = try facadesFolder.subfolder(named: "test")
 let trainDataset = try Facades(folder: trainFolder)
@@ -24,7 +41,7 @@ let batchSize = 1
 let lambdaL1 = Tensorf(100)
 let zeros = Tensorf(0)
 let ones = Tensorf(1)
-let gpuIndex: UInt = 3
+let gpuIndex = options.gpuIndex
 
 for epoch in 0..<epochs {
     print("Epoch \(epoch) started at: \(Date())")
