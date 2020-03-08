@@ -11,7 +11,7 @@ struct Options: ParsableArguments {
     @Option(default: 3, help: ArgumentHelp("GPU Index", valueName: "gpu-index"))
     var gpuIndex: UInt
     
-    @Option(default: 3, help: ArgumentHelp("Number of epochs", valueName: "epochs"))
+    @Option(default: 200, help: ArgumentHelp("Number of epochs", valueName: "epochs"))
     var epochs: Int
     
     @Option(default: "/tmp/tensorboardx", help: ArgumentHelp("TensorBoard logdir path", valueName: "tensorboard-logdir"))
@@ -36,7 +36,7 @@ var discriminator = NetD(inChannels: 6, lastConvFilters: 64)
 let optimizerG = Adam(for: generator, learningRate: 0.0002, beta1: 0.5)
 let optimizerD = Adam(for: discriminator, learningRate: 0.0002, beta1: 0.5)
 
-let epochs = 10000
+let epochs = options.epochs
 let batchSize = 1
 let lambdaL1 = Tensorf(100)
 let zeros = Tensorf(0)
